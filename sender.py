@@ -41,7 +41,7 @@ def filter_mails(maillist):
                 print('%s marked as invalid' % rec)
 
     print('%d in %d emails are marked as invalid and been discard' %
-          (len(valid_mails), len(maillist)))
+          (len(invalid_mails), len(maillist)))
     return valid_mails
 
 
