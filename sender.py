@@ -2,9 +2,13 @@ from validate_email import validate_email
 import requests
 import argparse
 import os
+import DNS
+import random
+import time
 
 GRP_SIZE = 100
 RECHECK = 2
+SMTP_TIMEOUT = 3
 
 parser = argparse.ArgumentParser(
     description='Send emails with mailgun api')
@@ -14,6 +18,7 @@ parser.add_argument('mlist', help='the email list file')
 args = parser.parse_args()
 
 URL = "https://api.mailgun.net/v3/%s/messages" % args.domain
+DNS.defaults['server'] = ['8.8.8.8', '8.8.4.4']
 
 
 def filter_mails(maillist):
@@ -21,7 +26,9 @@ def filter_mails(maillist):
     valid_mails = []
     for rec in maillist:
         receiver = rec.strip()
-        is_valid = validate_email(receiver, verify=True, smtp_timeout=1)
+        is_valid = validate_email(receiver,
+                                  verify=True,
+                                  smtp_timeout=SMTP_TIMEOUT)
         if not is_valid:
             invalid_mails.append(receiver)
         else:
@@ -58,11 +65,10 @@ if __name__ == "__main__":
     subject = os.environ['MailTitle']
     content = os.environ['MailContent']
 
-    all_receivers = filter_mails(open(args.mlist).read().split())
+    receivers = filter_mails(open(args.mlist).read().split())
 
-    rec_grps = [all_receivers[i: i + GRP_SIZE]
-                for i in range(0, len(all_receivers), GRP_SIZE)]
-    for grp in rec_grps:
-        print('send mail to %s' % grp)
-        res = send_simple_message(URL, sender, grp, subject, content)
+    for rec in receivers:
+        print('send mail to %s' % rec)
+        res = send_simple_message(URL, sender, rec, subject, content)
         print(res)
+        time.sleep(1 + random.random())
