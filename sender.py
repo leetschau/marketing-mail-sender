@@ -80,6 +80,10 @@ if __name__ == "__main__":
 
     for rec in receivers:
         print('send mail to %s' % rec)
-        res = send_simple_message(URL, sender, rec, subject, content)
-        print(res)
-        time.sleep(1 + random.random())
+        try:
+            res = send_simple_message(URL, sender, rec, subject, content)
+            print(res)
+            time.sleep(1 + random.random())
+        except:
+            print('%s when sending mail to %s' % (sys.exc_info()[0],
+                                                  rec))
