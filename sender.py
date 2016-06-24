@@ -5,6 +5,7 @@ import os
 import DNS
 import random
 import time
+import sys
 
 GRP_SIZE = 100
 RECHECK = 2
@@ -26,26 +27,34 @@ def filter_mails(maillist):
     valid_mails = []
     for rec in maillist:
         receiver = rec.strip()
-        is_valid = validate_email(receiver,
-                                  verify=True,
-                                  smtp_timeout=SMTP_TIMEOUT)
-        if not is_valid:
-            invalid_mails.append(receiver)
-        else:
-            print('%s ok' % receiver)
-            valid_mails.append(receiver)
+        try:
+            is_valid = validate_email(receiver,
+                                      verify=True,
+                                      smtp_timeout=SMTP_TIMEOUT)
+            if not is_valid:
+                invalid_mails.append(receiver)
+            else:
+                print('%s ok' % receiver)
+                valid_mails.append(receiver)
+        except:
+            print('%s when checking mail %s' % (sys.exc_info()[0],
+                                                receiver))
 
     for i in range(RECHECK):
         # timeout=1s maybe not enough, so filter invalid address again
         print('\nRecheck Round %d:\n' % (i + 1))
         for rec in invalid_mails:
-            is_valid = validate_email(rec, verify=True, smtp_timeout=1)
-            if is_valid:
-                print('%s ok' % rec)
-                invalid_mails.remove(rec)
-                valid_mails.append(rec)
-            else:
-                print('%s marked as invalid' % rec)
+            try:
+                is_valid = validate_email(rec, verify=True, smtp_timeout=1)
+                if is_valid:
+                    print('%s ok' % rec)
+                    invalid_mails.remove(rec)
+                    valid_mails.append(rec)
+                else:
+                    print('%s marked as invalid' % rec)
+            except:
+                print('%s when checking mail %s' % (sys.exc_info()[0],
+                                                    receiver))
 
     print('%d in %d emails are marked as invalid and been discard' %
           (len(invalid_mails), len(maillist)))
