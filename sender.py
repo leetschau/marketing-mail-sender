@@ -39,6 +39,7 @@ def filter_mails(maillist):
         except:
             print('%s when checking mail %s' % (sys.exc_info()[0],
                                                 receiver))
+            invalid_mails.append(receiver)
 
     for i in range(RECHECK):
         # timeout=1s maybe not enough, so filter invalid address again
@@ -55,6 +56,7 @@ def filter_mails(maillist):
             except:
                 print('%s when checking mail %s' % (sys.exc_info()[0],
                                                     receiver))
+                invalid_mails.append(receiver)
 
     print('%d in %d emails are marked as invalid and been discard' %
           (len(invalid_mails), len(maillist)))
