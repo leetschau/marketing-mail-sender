@@ -69,7 +69,7 @@ def send_simple_message(URL, sender, receiver, subject, content):
                          data={"from": sender,
                                "to": receiver,
                                "subject": subject,
-                               "text": content})
+                               "html": content})
 
 if __name__ == "__main__":
     sender = os.environ['Sender']
@@ -82,7 +82,8 @@ if __name__ == "__main__":
         print('send mail to %s' % rec)
         try:
             res = send_simple_message(URL, sender, rec, subject, content)
-            print(res)
+            print(res.text)
+            print(res.status_code)
             time.sleep(1 + random.random())
         except:
             print('%s when sending mail to %s' % (sys.exc_info()[0],
